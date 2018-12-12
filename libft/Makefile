@@ -77,7 +77,11 @@ SOURCES = ft_atoi.c\
 		  ft_mapalloc.c\
 		  ft_bin_to_dec.c\
 		  ft_first_c_from_end.c\
-		  ft_strnjoin.c
+		  ft_strnjoin.c\
+		  ft_hex_to_decimal.c\
+		  ft_power.c\
+		  ft_exit_msg.c\
+		  ft_strfjoin.c
 
 
 FLAGS = -Wall -Werror -Wextra -g

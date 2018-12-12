@@ -15,13 +15,12 @@
 
 # include "../../libft/libft.h"
 # include "../../op/op.h"
-#include <stdio.h>
 
 typedef struct 		s_op
 {
 	char			*command;
 	int				nb_arg;
-	int				arg_type[4];
+	int				arg_type[3];
 	int				op_code;
 	int				nb_cycle;
 	char			*lcommand;

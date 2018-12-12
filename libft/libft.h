@@ -111,5 +111,9 @@ char				**ft_mapalloc(int i, int j);
 int 				ft_bin_to_dec(const char *bit);
 int 				ft_first_c_from_end(char *str, char c);
 char				*ft_strnjoin(const char *s1, const char *s2, size_t len);
+unsigned long int	ft_hex_to_decimal(char *number);
+unsigned long int 	ft_power(int n, int pow);
+void				ft_exit_msg(char *str);
+char				*ft_strfjoin(char *s1, char *s2);
 
 #endif

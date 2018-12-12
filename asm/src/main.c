@@ -184,7 +184,6 @@ int		main(int ac, char **av)
 	int 	cor_fd;
 	int i = 0;
 	t_asm	data;
-	int 	j;
 
 	if (ac == 2)
 	{
@@ -196,13 +195,16 @@ int		main(int ac, char **av)
 
 	while (i < data.index)
 	{
-		j = 0;
-		while (j < 2)
-		{
-			ft_putchar_fd(data.codes[i++], cor_fd);
-			j++;
-		}
-		(i % 17 == 0) ? ft_putchar_fd('\n', cor_fd) : ft_putchar_fd(' ', cor_fd);
+		ft_putchar_fd((unsigned char)data.codes[i], cor_fd);
+		i++;
+	}
+
+	i = 0;
+	while (i < data.index)
+	{
+		ft_putnbr(data.codes[i]);
+		ft_putchar('\n');
+		i++;
 	}
 	free(data.codes);
 	ft_strdel(&data.name);

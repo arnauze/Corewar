@@ -11,6 +11,7 @@ $(NAME):
 	make -C libft/
 	make -C asm/
 	make -C vm/
+	make -C terminal/
 	gcc $(FLAGS) $(SRC) -o $(NAME) $(LIB)
 
 sanitize:

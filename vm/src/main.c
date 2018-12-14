@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amagnan <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: Arnaud <Arnaud@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/03 15:11:07 by amagnan           #+#    #+#             */
-/*   Updated: 2018/12/03 15:11:09 by amagnan          ###   ########.fr       */
+/*   Updated: 2018/12/13 16:54:54 by Arnaud           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <stdio.h>
@@ -86,42 +86,103 @@ void	get_magic_header(int fd, t_player *p)
 		p->header.magic = (unsigned int)ft_hex_to_decimal("ea83f3");
 }
 
-void	get_executable(int fd, t_player *p, char *arena)
+void	get_action(unsigned char *arena, unsigned int j, t_player *p)
+{
+	
+	p->action.max++;
+}
+
+void	get_player_actions(unsigned int i, t_player *p, unsigned char *arena)
+{
+	unsigned int	j;
+
+	j = 0;
+	p->action.track = 0;
+	p->action.max = 0;
+	while (j < i)
+		j = get_action(arena, j, p);
+}
+
+void	get_executable(int fd, t_player *p, unsigned char *arena)
 {
 	unsigned int	i;
 
 	if ((i = read(fd, arena, p->header.prog_size)) < p->header.prog_size)
 		ft_exit_msg("Couldn't read the executable properly\n");
+	get_player_actions(i, p, arena);
 	while (i < 2048)
 		arena[i++] = 0;
 }
 
-int		ft_get_player(int fd, t_player *p, char *arena)
+int		ft_get_player(t_player *p, unsigned char *arena)
 {
-	get_magic_header(fd, p);
-	get_name_and_size(fd, p);
-	get_comment(fd, p);
-	get_executable(fd, p, arena);
+	get_magic_header(p->fd, p);
+	get_name_and_size(p->fd, p);
+	get_comment(p->fd, p);
+	get_executable(p->fd, p, arena);
 	return (1);
 }
 
-char	*ft_read_files(char **argv, t_player *p1, t_player *p2)
+void			output_arena(unsigned char *arena, t_player p1, t_player p2)
 {
-	int	fd1;
-	int	fd2;
-	char	*arena;
-	int	i = 0;
-	int fff;
+	unsigned int	i;
+	char			*t;
+	(void)p2;
+	i = 0;
+	tputs(tgetstr("mr", NULL), 0, ft_putint);
+	while (i < 2048)
+	{
+		if (i <= p1.header.prog_size)
+			tputs(tgetstr("mr", NULL), 0, ft_putint);
+		if (i == (unsigned int)p1.index)
+			tputs(tgetstr("us", NULL), 0, ft_putint);
+		t = ft_itoa_base(arena[i], 16, "0123456789abcdef");
+		if (ft_strlen(t) < 2)
+			ft_putchar('0');
+		ft_putstr(t);
+		if (i == (unsigned int)p1.index)
+			tputs(tgetstr("ue", NULL), 0, ft_putint);
+		if ((i + 1) % 64 == 0)
+			ft_putchar('\n');
+		else
+			ft_putchar(' ');
+		i++;
+		if (i >= p1.header.prog_size)
+			tputs(tgetstr("me", NULL), 0, ft_putint);
+	}
+	// tputs(tgetstr("mr", NULL), 0, ft_putint);
+	// while (i < 4096)
+	// {
+	// 	if (i - 2048 == p2.header.prog_size)
+	// 		tputs(tgetstr("me", NULL), 0, ft_putint);
+	// 	if (i == (unsigned int)p2.index)
+	// 		tputs(tgetstr("us", NULL), 0, ft_putint);
+	// 	t = ft_itoa_base(arena[i], 16, "0123456789abcdef");
+	// 	if (ft_strlen(t) < 2)
+	// 		ft_putchar('0');
+	// 	ft_putstr(t);
+	// 	if ((i + 1) % 64 == 0)
+	// 		ft_putchar('\n');
+	// 	else
+	// 		ft_putchar(' ');
+	// 	if (i == (unsigned int)p2.index)
+	// 		tputs(tgetstr("ue", NULL), 0, ft_putint);
+	// 	i++;
+	// }
+}
 
-	fff = open("t.cor", O_RDWR);
-	arena = ft_strnew(4096);
-	if (((fd1 = open(ft_get_file(argv, 1), O_RDONLY)) < 0)
-		|| (fd2 = open(ft_get_file(argv, 2), O_RDONLY)) < 0)
+unsigned char	*ft_read_files(char **argv, t_player *p1, t_player *p2)
+{
+	unsigned char	*arena;
+
+	arena = (unsigned char *)ft_strnew(4096);
+	if (((p1->fd = open(ft_get_file(argv, 1), O_RDONLY)) < 0)
+		|| (p2->fd = open(ft_get_file(argv, 2), O_RDONLY)) < 0)
 		ft_exit_msg("File can't be open\n");
-	if (!ft_get_player(fd1, p1, arena) || !ft_get_player(fd2, p2, arena))
+	if (!ft_get_player(p1, arena) || !ft_get_player(p2, arena + 2048))
 		ft_exit_msg("File error\n");
-	while (i < 4096)
-		ft_putchar_fd(arena[i++], fff);
+	p1->index = 0;
+	p2->index = 2048;
 	return (arena);
 }
 
@@ -129,11 +190,24 @@ int		main(int argc, char **argv)
 {
 	t_player	p1;
 	t_player	p2;
-	char		*arena;
+	t_term		term;
+	unsigned char		*arena;
 
+	term = get_terminal();
+	terminal_on(&term);
 	if (argc > 1)
 	{
 		arena = ft_read_files(argv, &p1, &p2);
+		while (1)
+		{
+			output_arena(arena, p1, p2);
+			receive_key(&term);
+			if ((p1.index += p1.action.size[p1.action.track++]) > p1.header.prog_size)
+				p1.index = 0;
+			if (p1.action.track > p1.action.max)
+				p1.action.track = 0;
+		}
 	}
+	terminal_off(&term);
 	return (0);
 }

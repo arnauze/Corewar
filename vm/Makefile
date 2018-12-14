@@ -1,9 +1,11 @@
 OBJECTS = *.o
 SRC = ../op/op.c\
-		src/main.c\
+		src/main.c
 
-LIB = ../libft/libft.a
-FLAGS = -Wall -Wextra -Werror
+LIB = ../libft/libft.a\
+		../terminal/term.a
+
+FLAGS = -Wall -Wextra -Werror -lncurses
 NAME = vm
 
 all: $(NAME)

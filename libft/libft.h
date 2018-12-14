@@ -115,5 +115,6 @@ unsigned long int	ft_hex_to_decimal(char *number);
 unsigned long int 	ft_power(int n, int pow);
 void				ft_exit_msg(char *str);
 char				*ft_strfjoin(char *s1, char *s2);
+char				*ft_char_to_bit(int nb);
 
 #endif

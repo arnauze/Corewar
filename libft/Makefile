@@ -81,7 +81,8 @@ SOURCES = ft_atoi.c\
 		  ft_hex_to_decimal.c\
 		  ft_power.c\
 		  ft_exit_msg.c\
-		  ft_strfjoin.c
+		  ft_strfjoin.c\
+		  ft_char_to_bit.c
 
 
 FLAGS = -Wall -Werror -Wextra -g

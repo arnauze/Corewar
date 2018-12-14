@@ -5,7 +5,8 @@ SOURCES = ../libft/*.c\
 			terminal_off.c\
 			terminal_on.c\
 			ft_quit.c\
-			receive_key.c
+			receive_key.c\
+			get_size.c
 
 FLAGS = -Wall -Werror -Wextra
 NAME = term.a

@@ -6,7 +6,7 @@
 /*   By: Arnaud <Arnaud@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/03 15:11:07 by amagnan           #+#    #+#             */
-/*   Updated: 2018/12/13 16:54:54 by Arnaud           ###   ########.fr       */
+/*   Updated: 2018/12/14 06:40:14 by Arnaud           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 #include <stdio.h>
@@ -276,16 +276,25 @@ unsigned char	*ft_read_files(char **argv, t_player *p1, t_player *p2)
 	return (arena);
 }
 
-void	init_vm(t_vm *vm, char **argv)
+t_vm	get_vm(char **argv, t_vm *new)
 {
-	vm->cycle_to_die = CYCLE_TO_DIE;
-	vm->cycle = vm->cycle_to_die;
-	vm->checks = 0;
-	vm->decrease = 0;
-	vm->live = 0;
-	vm->term = get_terminal();
-	vm->arena = ft_read_files(argv, &vm->p1, &vm->p2);
-	terminal_on(&vm->term);
+	static t_vm vm;
+
+	if (argv)
+	{
+		vm.cycle_to_die = CYCLE_TO_DIE;
+		vm.cycle = vm.cycle_to_die;
+		vm.checks = 0;
+		vm.decrease = 0;
+		vm.live = 0;
+		vm.term = get_terminal();
+		vm.arena = ft_read_files(argv, &vm.p1, &vm.p2);
+		terminal_on(&vm.term);
+	}
+	else
+		if (new)
+			vm = *new;
+	return (vm);
 }
 
 void	handle_cycle(t_vm *vm)
@@ -328,7 +337,10 @@ void	start_vm(t_vm vm)
 {
 	while (1)
 	{
-		output_arena(vm);
+		if (get_size(&vm.term) == -1)
+			ft_putstr("Not enough space\n");
+		else
+			output_arena(vm);
 		if (vm.arena[vm.p1.index] == 1)
 			vm.live++;
 		if (vm.arena[vm.p2.index] == 1)
@@ -336,18 +348,47 @@ void	start_vm(t_vm vm)
 		receive_key(&vm.term);
 		handle_index_and_track(&vm);
 		handle_cycle(&vm);
+		get_vm(NULL, &vm);
 	}
+}
+
+void		signal_handler(int sig)
+{
+	t_vm	vm;
+
+	vm = get_vm(NULL, NULL);
+	if (sig == SIGINT || sig == SIGABRT || sig == SIGKILL
+		|| sig == SIGQUIT || sig == SIGTSTP)
+		ft_quit(&vm.term);
+	else if (sig == SIGWINCH)
+	{
+		tputs(tgetstr("cl", NULL), 0, ft_putint);
+		if (get_size(&vm.term) == -1)
+			ft_putstr("Not enought space\n");
+		else
+			output_arena(vm);
+	}
+}
+
+void		initialize_signals(void)
+{
+	signal(SIGTSTP, signal_handler);
+	signal(SIGINT, signal_handler);
+	signal(SIGABRT, signal_handler);
+	signal(SIGKILL, signal_handler);
+	signal(SIGQUIT, signal_handler);
+	signal(SIGWINCH, signal_handler);
 }
 
 int		main(int argc, char **argv)
 {
 	t_vm	vm;
 
-	init_vm(&vm, argv);;
+	vm = get_vm(argv, NULL);
 	terminal_on(&vm.term);
+	initialize_signals();
 	if (argc > 1)
 	{
-		init_vm(&vm, argv);
 		start_vm(vm);
 		terminal_off(&vm.term);
 	}

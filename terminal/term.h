@@ -13,6 +13,9 @@ typedef	struct			s_term
 	struct termios		old_term;
 	struct termios		new_term;
 	struct winsize		win_size;
+	int 				def;
+	int 				max_col;
+	int 				max_row;
 }						t_term;
 
 int						ft_putint(int c);
@@ -21,8 +24,7 @@ void					terminal_on(t_term *terminal);
 t_term					get_terminal(void);
 void					ft_quit(t_term *terminal);
 void					receive_key(t_term *terminal);
-// void					initialize_signals(void);
-// void					signal_handler(int sig);
+int						get_size(t_term *term);
 
 # define ENTER					10
 # define ESC_KEY				27

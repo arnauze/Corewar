@@ -34,3 +34,5 @@ fclean: clean
 
 re: fclean all
  
+test:
+	./$(NAME) ../zork.cor ../vm_champs/champs/Gagnant.cor

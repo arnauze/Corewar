@@ -14,8 +14,9 @@
 # define VM_H
 
 # include "../../libft/libft.h"
-# include "../../terminal/term.h"
+// # include "../../terminal/term.h"
 # include "../../op/op.h"
+# include <ncurses.h>
 
 typedef struct		header_s
 {
@@ -49,7 +50,7 @@ typedef struct 		s_vm
 	t_player		p1;
 	t_player		p2;
 	t_process		*process;
-	t_term			term;
+	// t_term			term;
 	unsigned char	*arena;
 	int				cycle_to_die;
 	int				tcycle;

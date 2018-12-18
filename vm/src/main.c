@@ -145,44 +145,49 @@
 // 		vm->p2.action.track = 0;
 // }
 
-void		signal_handler(int sig)
-{
-	t_vm	vm;
+// void		signal_handler(int sig)
+// {
+// 	t_vm	vm;
 
-	vm = get_vm(NULL, NULL);
-	if (sig == SIGINT || sig == SIGABRT || sig == SIGKILL
-		|| sig == SIGQUIT || sig == SIGTSTP)
-		ft_quit(&vm.term);
-	else if (sig == SIGWINCH)
-	{
-		tputs(tgetstr("cl", NULL), 0, ft_putint);
-		if (get_size(&vm.term) == -1)
-			ft_putstr("Not enough space\n");
-		else
-			output_arena(&vm);
-	}
-}
+// 	vm = get_vm(NULL, NULL);
+// 	if (sig == SIGINT || sig == SIGABRT || sig == SIGKILL
+// 		|| sig == SIGQUIT || sig == SIGTSTP)
+// 		endwin();
+// 	// else if (sig == SIGWINCH)
+// 	// {
+// 	// 	tputs(tgetstr("cl", NULL), 0, ft_putint);
+// 	// 	if (get_size(&vm.term) == -1)
+// 	// 		ft_putstr("Not enough space\n");
+// 	// 	else
+// 	// 		output_arena(&vm);
+// 	// }
+// }
 
-void		initialize_signals(void)
-{
-	signal(SIGTSTP, signal_handler);
-	signal(SIGINT, signal_handler);
-	signal(SIGABRT, signal_handler);
-	signal(SIGKILL, signal_handler);
-	signal(SIGQUIT, signal_handler);
-	signal(SIGWINCH, signal_handler);
-}
+// void		initialize_signals(void)
+// {
+// 	signal(SIGTSTP, signal_handler);
+// 	signal(SIGINT, signal_handler);
+// 	signal(SIGABRT, signal_handler);
+// 	signal(SIGKILL, signal_handler);
+// 	signal(SIGQUIT, signal_handler);
+// 	signal(SIGWINCH, signal_handler);
+// }
 
 int		main(int argc, char **argv)
 {
 	t_vm	vm;
-	(void)argc;
+
 	vm = get_vm(argv, NULL);
-	initialize_signals();
+	initscr();
+	cbreak();
+	noecho();
+	keypad(stdscr, TRUE);
+	// initialize_signals();
 	if (argc > 1)
 	{
 		start_vm(&vm);
-		terminal_off(&vm.term);
+		// terminal_off(&vm.term);
 	}
+	endwin();
 	return (0);
 }

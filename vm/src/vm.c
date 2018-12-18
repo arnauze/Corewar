@@ -19,7 +19,7 @@ t_vm	get_vm(char **argv, t_vm *new)
 	if (argv && !new)
 	{
 		vm.process = NULL;
-		vm.term = get_terminal();
+		// vm.term = get_terminal();
 		vm.arena = ft_read_files(argv, &vm);
 		vm.cycle_to_die = CYCLE_TO_DIE;
 		vm.tcycle = 0;
@@ -28,7 +28,7 @@ t_vm	get_vm(char **argv, t_vm *new)
 		vm.nlive = 0;
 		vm.last_live = 0;
 		initialize_process(&vm);
-		terminal_on(&vm.term);
+		// terminal_on(&vm.term);
 	}
 	else
 		if (new)
@@ -178,6 +178,7 @@ int 	HANDLE_CYCLE(t_vm *vm)
 void	start_vm(t_vm *vm)
 {
 	t_process	*head;
+	int 		c;
 
 	head = vm->process;
 	while (1)
@@ -191,7 +192,9 @@ void	start_vm(t_vm *vm)
 		}
 		vm->process = head;
 		output_arena(vm);
-		receive_key(&vm->term);
+		if ((c = getch()) == KEY_BACKSPACE)
+			break ;
+		// receive_key(&vm->term);
 		if (!HANDLE_CYCLE(vm))
 			if (!FT_TIME_FOR_CHECKS(vm))
 				break ;

@@ -1,6 +1,11 @@
 OBJECTS = *.o
 SRC = ../op/op.c\
-		src/main.c
+		src/main.c\
+		src/arena.c\
+		src/ft_get_player.c\
+		src/ft_read_file.c\
+		src/process.c\
+		src/vm.c
 
 LIB = ../libft/libft.a\
 		../terminal/term.a

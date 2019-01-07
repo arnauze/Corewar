@@ -56,14 +56,11 @@ void			output_arena(t_vm *vm)
 	int m;
 
 	m = 0;
-	(void)vm;
-	i = 0;
 	clear();
 	start_color();
 	init_pair(1, COLOR_WHITE, COLOR_RED);
 	init_pair(2, COLOR_WHITE, COLOR_BLUE);
 	init_pair(3, COLOR_BLACK, COLOR_WHITE);
-	// tputs(tgetstr("mr", NULL), 0, ft_putint);
 	printw("\t\t\t\t\t\t\t\t\t\t*****DOOMLAND*****\t\t\t\t\t\t\t\t\t\n");
 	i = -1;
 	while (++i < 65 * 3 - 1)

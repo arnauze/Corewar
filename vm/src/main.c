@@ -181,12 +181,11 @@ int		main(int argc, char **argv)
 	initscr();
 	cbreak();
 	noecho();
+	curs_set(0);
 	keypad(stdscr, TRUE);
-	// initialize_signals();
 	if (argc > 1)
 	{
 		start_vm(&vm);
-		// terminal_off(&vm.term);
 	}
 	endwin();
 	return (0);

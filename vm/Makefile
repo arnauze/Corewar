@@ -8,7 +8,6 @@ SRC = ../op/op.c\
 		src/vm.c
 
 LIB = ../libft/libft.a\
-		../terminal/term.a
 
 FLAGS = -Wall -Wextra -Werror -lncurses
 NAME = vm

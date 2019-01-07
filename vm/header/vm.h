@@ -14,7 +14,6 @@
 # define VM_H
 
 # include "../../libft/libft.h"
-// # include "../../terminal/term.h"
 # include "../../op/op.h"
 # include <ncurses.h>
 

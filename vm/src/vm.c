@@ -104,6 +104,11 @@ int		validate_codingbyte(unsigned char op_code, unsigned char c_byte)
 // 	}
 // }
 
+void 	execute_action(t_process *process)
+{
+	process->index += 2;
+}
+
 int 	READ_ARENA(t_vm *vm, t_process *process)
 {
 	if ((vm->arena[process->index] > 16 || vm->arena[process->index] < 1) ||
@@ -118,7 +123,7 @@ int 	READ_ARENA(t_vm *vm, t_process *process)
 			return (0);
 		else
 		{
-			process->index += 2;
+			execute_action(process);
 			return (1);
 		}
 	}
@@ -175,26 +180,32 @@ int 	HANDLE_CYCLE(t_vm *vm)
 	return (vm->cycle > 0);
 }
 
+void 	init_cycles(t_vm *vm, t_process *process)
+{
+	if ((vm->arena[process->index] > 16 || vm->arena[process->index] < 1) ||
+		!validate_codingbyte(vm->arena[process->index], vm->arena[process->index + 1]))
+		process->c_to_wait = 0;
+	else
+		process->c_to_wait = op_tab[vm->arena[process->index] - 1].nb_cycle;
+}
+
 void	start_vm(t_vm *vm)
 {
-	t_process	*head;
+	t_process	*current;
 	int 		c;
 
-	head = vm->process;
+	current = vm->process;
 	while (1)
 	{
-		while (vm->process)
+		while (current)
 		{
-			READ_ARENA(vm, vm->process);
-			// 	FT_EXECUTE_ACTION(vm, vm->process);
-			// TRY_ACTION(vm, vm->process);
-			vm->process = vm->process->next;
+			if (READ_ARENA(vm, current) != 0)
+				init_cycles(vm, current);
+			current = current->next;
 		}
-		vm->process = head;
 		output_arena(vm);
 		if ((c = getch()) == KEY_BACKSPACE)
 			break ;
-		// receive_key(&vm->term);
 		if (!HANDLE_CYCLE(vm))
 			if (!FT_TIME_FOR_CHECKS(vm))
 				break ;

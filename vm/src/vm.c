@@ -19,7 +19,6 @@ t_vm	get_vm(char **argv, t_vm *new)
 	if (argv && !new)
 	{
 		vm.process = NULL;
-		// vm.term = get_terminal();
 		vm.arena = ft_read_files(argv, &vm);
 		vm.cycle_to_die = CYCLE_TO_DIE;
 		vm.tcycle = 0;
@@ -28,7 +27,6 @@ t_vm	get_vm(char **argv, t_vm *new)
 		vm.nlive = 0;
 		vm.last_live = 0;
 		initialize_process(&vm);
-		// terminal_on(&vm.term);
 	}
 	else
 		if (new)
@@ -36,48 +34,74 @@ t_vm	get_vm(char **argv, t_vm *new)
 	return (vm);
 }
 
+int 	c_byte_size(unsigned char c_byte)
+{
+	char 	*new;
+	int 	i;
+	int count;
+
+	count = 0;
+	i = 0;
+	new = ft_char_to_bit((int)c_byte);
+	while (i < 8)
+	{
+		if (!ft_strncmp(new + i, "10", 2))
+			count += 4;
+		else if (!ft_strncmp(new + i, "11", 2))
+			count += 2;
+		else if (!ft_strncmp(new + i, "01", 2))
+			count += 1;
+		i += 2;
+	}
+	return (count + 2);
+}
+
 int		validate_codingbyte(unsigned char op_code, unsigned char c_byte)
 {
-	if (op_code == 1 || op_code == 9 || op_code == 12 || op_code == 15)
-			return (1);
+	if (op_code == 1)
+		return (5);
+	else if (op_code == 9 || op_code == 12 || op_code == 15)
+	{
+		return (3);
+	}
 	else if (op_code == 2 || op_code == 13)
 	{
 		if (c_byte == 144 || c_byte == 208)
-			return (1);
+			return (c_byte_size(c_byte));
 	}
 	else if (op_code == 3)
 	{
 		if (c_byte == 80 || c_byte == 112)
-			return (1);
+			return (c_byte_size(c_byte));
 	}
 	else if (op_code == 4 || op_code == 5)
 	{
 		if (c_byte == 84)
-			return (1);
+			return (c_byte_size(c_byte));
 	}
 	else if (op_code == 6 || op_code == 7 || op_code == 8)
 	{
 		if (c_byte == 84 || c_byte == 148 || c_byte == 212 ||
 		c_byte == 228 || c_byte == 164 || c_byte == 100 ||
 		c_byte == 116 || c_byte == 244 || c_byte == 180)
-			return (1);
+			return (c_byte_size(c_byte));
 	}
 	else if (op_code == 10 || op_code == 14)
 	{
 		if (c_byte == 84 || c_byte == 212 || c_byte == 148 ||
 		c_byte == 100 || c_byte == 164 || c_byte == 228)
-			return (1);
+			return (c_byte_size(c_byte));
 	}
 	else if (op_code == 11)
 	{
 		if (c_byte == 84 || c_byte == 88 || c_byte == 100 ||
 		c_byte == 104 || c_byte == 120 || c_byte == 116)
-			return (1);
+			return (c_byte_size(c_byte));
 	}
 	else if (op_code == 16)
 	{
 		if (c_byte == 64)
-			return (1);
+			return (c_byte_size(c_byte));
 	}
 	return (0);
 }
@@ -104,15 +128,22 @@ int		validate_codingbyte(unsigned char op_code, unsigned char c_byte)
 // 	}
 // }
 
-void 	execute_action(t_process *process)
+void 	execute_action(t_vm *vm, t_process *process, int size)
 {
-	process->index += 2;
+	if (vm->arena[process->index] == 1)
+	{
+		vm->nlive++;
+		process->nlive++;
+	}
+	process->index += size;
 }
 
 int 	READ_ARENA(t_vm *vm, t_process *process)
 {
-	if ((vm->arena[process->index] > 16 || vm->arena[process->index] < 1) ||
-		!validate_codingbyte(vm->arena[process->index], vm->arena[process->index + 1]))
+	int size = 0;
+
+	size = validate_codingbyte(vm->arena[process->index], vm->arena[process->index + 1]);
+	if ((vm->arena[process->index] > 16 || vm->arena[process->index] < 1) || size == 0)
 	{
 		process->index++;
 		return (-1);
@@ -123,7 +154,7 @@ int 	READ_ARENA(t_vm *vm, t_process *process)
 			return (0);
 		else
 		{
-			execute_action(process);
+			execute_action(vm, process, size);
 			return (1);
 		}
 	}
@@ -157,6 +188,8 @@ int 	FT_TIME_FOR_CHECKS(t_vm *vm)
 			free(tmp);
 			tmp = NULL;
 		}
+		else
+			current->next->nlive = 0;
 		current = current->next;
 	}
 	vm->cycle = vm->cycle_to_die;
@@ -192,11 +225,10 @@ void 	init_cycles(t_vm *vm, t_process *process)
 void	start_vm(t_vm *vm)
 {
 	t_process	*current;
-	int 		c;
 
-	current = vm->process;
 	while (1)
 	{
+		current = vm->process;
 		while (current)
 		{
 			if (READ_ARENA(vm, current) != 0)
@@ -204,7 +236,7 @@ void	start_vm(t_vm *vm)
 			current = current->next;
 		}
 		output_arena(vm);
-		if ((c = getch()) == KEY_BACKSPACE)
+		if (getch() == 127)
 			break ;
 		if (!HANDLE_CYCLE(vm))
 			if (!FT_TIME_FOR_CHECKS(vm))

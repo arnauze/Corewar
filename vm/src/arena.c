@@ -37,7 +37,7 @@ void			ADD_END_STRING(int x, int i)
 	}
 	else if (x == 2)
 		attroff(COLOR_PAIR(3));
-	printw("  |\n");
+	printw("  |\n| ");
 	if (x == 1)
 	{
 		if (i < 2048)
@@ -47,6 +47,31 @@ void			ADD_END_STRING(int x, int i)
 	}
 	else if (x == 2)
 		attron(COLOR_PAIR(3));
+}
+
+void			ADD_INFORMATIONS(t_vm *vm)
+{
+	int i = 4;
+	(void)vm;
+	mvprintw(3, 200, "------------------------------------------------------------");
+	mvprintw(6, 202, "Total cycle: %d", vm->tcycle);
+	mvprintw(7, 202, "Cycle to die: %d", vm->cycle);
+	mvprintw(8, 202, "Live count: %d", vm->nlive);
+	mvprintw(15, 202, "Player 1:");
+	mvprintw(16, 202, "Name: %s", vm->p1.header.prog_name);
+	mvprintw(17, 202, "Comment: %s", vm->p1.header.comment);
+	mvprintw(18, 202, "Live: %d", vm->p1.nlive);
+	mvprintw(25, 202, "Player 2:");
+	mvprintw(26, 202, "Name: %s", vm->p2.header.prog_name);
+	mvprintw(27, 202, "Comment: %s", vm->p2.header.comment);
+	mvprintw(28, 202, "Live: %d", vm->p2.nlive);
+	while (i < 31)
+	{
+		mvaddch(i, 199, '|');
+		mvaddch(i, 260, '|');
+		i++;
+	}
+	mvprintw(31, 200, "------------------------------------------------------------");
 }
 
 void			output_arena(t_vm *vm)
@@ -66,6 +91,7 @@ void			output_arena(t_vm *vm)
 	while (++i < 65 * 3 - 1)
 		addch('-');
 	addch('\n');
+	printw("| ") ;
 	i = 0;
 	while (i < 2048)
 	{
@@ -124,5 +150,6 @@ void			output_arena(t_vm *vm)
 	i = -1;
 	while (++i < 65 * 3 - 1)
 		addch('-');
+	ADD_INFORMATIONS(vm);
 	refresh();
 }

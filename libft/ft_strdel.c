@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strdel.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amagnan <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: feedme <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/09/11 13:00:42 by amagnan           #+#    #+#             */
-/*   Updated: 2018/09/11 13:00:42 by amagnan          ###   ########.fr       */
+/*   Created: 2018/04/23 14:37:14 by feedme            #+#    #+#             */
+/*   Updated: 2018/05/05 20:07:45 by feedme           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-void		ft_strdel(char **as)
+void	ft_strdel(char **as)
 {
 	if (as == NULL)
 		return ;

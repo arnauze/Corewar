@@ -3,76 +3,81 @@
 /*                                                        :::      ::::::::   */
 /*   ft_strsplit.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: amagnan <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: feedme <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2018/09/11 14:31:00 by amagnan           #+#    #+#             */
-/*   Updated: 2018/09/11 14:31:01 by amagnan          ###   ########.fr       */
+/*   Created: 2018/04/24 13:00:09 by feedme            #+#    #+#             */
+/*   Updated: 2018/05/06 22:52:32 by feedme           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libft.h"
 
-static	int		ft_count_words(const char *s, char c)
+static unsigned int		ft_counts_words(char const *s, char c)
 {
-	int	n;
-	int	i;
+	unsigned int	count;
+	unsigned int	i;
 
 	i = 0;
-	n = 0;
-	if (!s)
-		return (0);
+	count = 0;
 	while (s[i])
 	{
-		if (s[i] == c && s[i + 1] != c)
-			n++;
+		if (s[i] != c)
+			if (s[i + 1] == c || s[i + 1] == '\0')
+				count++;
 		i++;
 	}
-	if (s[0] != '\0')
-		n++;
-	return (n);
+	return (count);
 }
 
-static	char	*ft_word(const char *str, char c, int *i)
+static char				*ft_putword(char const *s, char c, unsigned int i)
 {
-	char	*s;
-	int		k;
+	char			*tmp;
+	unsigned int	size;
+	unsigned int	i0;
+	unsigned int	x;
 
-	if (!(s = (char *)malloc(sizeof(s) * (ft_strlen(str)))))
-		return (NULL);
-	k = 0;
-	while (str[*i] != c && str[*i])
+	x = 0;
+	size = 0;
+	i0 = i;
+	while (s[i] != c && s[i])
 	{
-		s[k] = str[*i];
-		k++;
-		*i += 1;
-	}
-	s[k] = '\0';
-	while (str[*i] == c && str[*i])
-		*i += 1;
-	return (s);
-}
-
-char			**ft_strsplit(const char *str, char c)
-{
-	int		i;
-	int		j;
-	int		wrd;
-	char	**s;
-
-	i = 0;
-	j = 0;
-	if (!str)
-		return (NULL);
-	wrd = ft_count_words(str, c);
-	if (!(s = (char **)malloc(sizeof(s) * (ft_count_words(str, c) + 2))))
-		return (NULL);
-	while (str[i] == c && str[i])
 		i++;
-	while (j < wrd && str[i])
-	{
-		s[j] = ft_word(str, c, &i);
-		j++;
+		size++;
 	}
-	s[j] = NULL;
-	return (s);
+	if ((tmp = (char *)malloc(size + 1)) == NULL)
+		return (NULL);
+	while (i0 != i)
+	{
+		tmp[x] = s[i0];
+		x++;
+		i0++;
+	}
+	tmp[x] = '\0';
+	return (tmp);
+}
+
+char					**ft_strsplit(char const *s, char c)
+{
+	unsigned int	word_count;
+
+	FELIX1;
+	if (s == NULL)
+		return (NULL);
+	word_count = ft_counts_words(s, c);
+	if ((array = (char **)malloc(sizeof(char *) * (word_count + 1))) == NULL)
+		return (NULL);
+	while (j < word_count)
+	{
+		if (s[i] == c)
+			i++;
+		else
+		{
+			array[j] = ft_putword(s, c, i);
+			j++;
+			while (s[i] != c && s[i])
+				i++;
+		}
+	}
+	array[j] = NULL;
+	return (array);
 }

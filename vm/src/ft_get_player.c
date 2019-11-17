@@ -6,7 +6,7 @@
 /*   By: amagnan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/16 14:00:39 by amagnan           #+#    #+#             */
-/*   Updated: 2018/12/16 14:00:39 by amagnan          ###   ########.fr       */
+/*   Updated: 2019/03/13 23:12:32 by feedme           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,30 +20,22 @@ static void	get_magic_header(int fd, t_player *p)
 		p->header.magic = (unsigned int)ft_hex_to_decimal("ea83f3");
 }
 
-static void	get_name_and_size(int fd, t_player *p)
+static int	get_name_and_size(int fd, t_player *p)
 {
-	char	buf[5];
-	char	*part1;
-	char	*part2;
-	char	*part3;
-	char	*part4;
-	char	*tmp;
+	unsigned char	buf[5];
 
 	if (read(fd, p->header.prog_name, PROG_NAME_LENGTH))
 		p->header.prog_name[PROG_NAME_LENGTH] = '\0';
 	read(fd, buf, 4);
-	ft_bzero(buf, ft_strlen(buf));
+	ft_bzero(buf, ft_strlen((char*)buf));
 	if (read(fd, buf, 4))
 	{
 		buf[4] = '\0';
-		part1 = ft_itoa_base(buf[0], 16, "0123456789abcdef");
-		part2 = ft_itoa_base(buf[1], 16, "0123456789abcdef");
-		part3 = ft_itoa_base(buf[2], 16, "0123456789abcdef");
-		part4 = ft_itoa_base(buf[3], 16, "0123456789abcdef");
-		tmp = ft_strfjoin(ft_strjoin(part1, part2), ft_strjoin(part3, part4));
-		p->header.prog_size = (unsigned int)ft_hex_to_decimal(tmp);
-		ft_strdel(&tmp);
+		p->header.prog_size = get_ind(0, buf, 4);
+		if (p->header.prog_size > CHAMP_MAX_SIZE || !p->header.prog_size)
+			return (0);
 	}
+	return (42);
 }
 
 static void	get_comment(int fd, t_player *p)
@@ -65,10 +57,11 @@ static void	get_executable(int fd, t_player *p, unsigned char *arena)
 		arena[i++] = 0;
 }
 
-int		ft_get_player(t_player *p, unsigned char *arena)
+int			ft_get_player(t_player *p, unsigned char *arena)
 {
 	get_magic_header(p->fd, p);
-	get_name_and_size(p->fd, p);
+	if (!get_name_and_size(p->fd, p))
+		return (0);
 	get_comment(p->fd, p);
 	get_executable(p->fd, p, arena);
 	return (1);

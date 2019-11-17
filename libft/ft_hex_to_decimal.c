@@ -6,7 +6,7 @@
 /*   By: amagnan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/10 23:17:45 by amagnan           #+#    #+#             */
-/*   Updated: 2018/12/10 23:17:46 by amagnan          ###   ########.fr       */
+/*   Updated: 2019/03/15 14:22:54 by feedme           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,10 +14,10 @@
 
 unsigned long int		ft_hex_to_decimal(char *number)
 {
-	int			i;
-	int			j;
-	unsigned long int			n;
-	int			add;
+	int					i;
+	int					j;
+	unsigned long int	n;
+	int					add;
 
 	n = 0;
 	j = 0;

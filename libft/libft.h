@@ -6,7 +6,7 @@
 /*   By: Arnaud <Arnaud@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/09/13 11:39:16 by amagnan           #+#    #+#             */
-/*   Updated: 2018/11/23 10:22:12 by Arnaud           ###   ########.fr       */
+/*   Updated: 2019/03/15 14:20:27 by feedme           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -108,11 +108,11 @@ char				*ft_clean_str(char *str);
 int					get_next_line(const int fd, char **line);
 void				ft_mapdel(char **str);
 char				**ft_mapalloc(int i, int j);
-int 				ft_bin_to_dec(const char *bit);
-int 				ft_first_c_from_end(char *str, char c);
+int					ft_bin_to_dec(const char *bit);
+int					ft_first_c_from_end(char *str, char c);
 char				*ft_strnjoin(const char *s1, const char *s2, size_t len);
 unsigned long int	ft_hex_to_decimal(char *number);
-unsigned long int 	ft_power(int n, int pow);
+unsigned long int	ft_power(int n, int pow);
 void				ft_exit_msg(char *str);
 char				*ft_strfjoin(char *s1, char *s2);
 char				*ft_char_to_bit(int nb);

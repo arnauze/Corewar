@@ -6,76 +6,95 @@
 /*   By: amagnan <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2018/12/16 13:58:34 by amagnan           #+#    #+#             */
-/*   Updated: 2018/12/16 13:58:36 by amagnan          ###   ########.fr       */
+/*   Updated: 2019/02/14 17:14:13 by feedme           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../header/vm.h"
 
-static void			initialize_players(t_player *p1, t_player *p2)
-{
-	p1->nlive = 0;
-	p1->talk = 0;
-	p1->fd = 0;
-	p2->nlive = 0;
-	p2->talk = 0;
-	p2->fd = 0;
-}
-
-static void			make_process(t_vm *vm)
+static void		make_process(t_vm *vm)
 {
 	vm->process = make_node(0);
 	vm->process->next = make_node(1);
 }
 
-void				initialize_process(t_vm *vm)
+void			initialize_process(t_vm *vm)
 {
 	vm->process->index = 0;
-	vm->process->c_to_wait = op_tab[vm->arena[vm->process->index] - 1].nb_cycle;
-	vm->process->next->index = 2048;
-	vm->process->next->c_to_wait = op_tab[vm->arena[vm->process->next->index] - 1].nb_cycle;
+	vm->process->c_to_wait = g_op_tab[vm->arena[vm->process->index]
+	- 1].nb_cycle;
+	vm->process->next->index = MEM_SIZE / 2;
+	vm->process->next->c_to_wait = g_op_tab[vm->arena[vm->process->next->index]
+	- 1].nb_cycle;
 }
 
-static char			*ft_get_file(char **argv, int x)
+unsigned char	*build_nbr(int nb)
 {
-	int	i;
-	int	c;
+	int				i;
+	int				j;
+	char			*bits;
+	unsigned char	*nbr;
 
-	c = 0;
-	i = 0;
-	if (x == 1)
+	if (!(nbr = (unsigned char*)malloc(4)))
+		exit(-1);
+	bits = int_to_bit(nb);
+	i = 24;
+	j = 3;
+	while (i > -1)
 	{
-		while (argv[++i])
-		{
-			if (ft_strstr(argv[i], ".cor"))
-				return (argv[i]);
-		}
+		nbr[j] = bit_to_dec(bits + i, 1);
+		i -= 8;
+		j--;
 	}
-	else if (x == 2)
-	{
-		while (argv[++i])
-		{
-			if (ft_strstr(argv[i], ".cor"))
-			{
-				if (++c == 2)
-					return (argv[i]);
-			}
-		}
-	}
-	return (NULL);
+	free(bits);
+	return (nbr);
 }
 
-unsigned char		*ft_read_files(char **argv, t_vm *vm)
+void			ft_get_file(char **argv, t_vm *vm)
+{
+	int				i;
+	int				nbr1;
+	int				nbr2;
+	int				nbr;
+
+	nbr = 0;
+	i = 1;
+	if (!ft_strcmp(argv[1], "-dump") && (vm->nbr_cycles = ft_atoi(argv[2])))
+		i += 2;
+	if (!ft_strcmp(argv[i], "-n") && (nbr1 = ft_atoi(argv[i + 1])))
+		i += 2;
+	else
+		nbr1 = ++nbr;
+	vm->p2->filename = (unsigned char*)argv[i];
+	if (!ft_strcmp(argv[++i], "-n") && (nbr2 = ft_atoi(argv[i + 1])))
+		i += 2;
+	else
+		nbr2 = ++nbr;
+	vm->p1->filename = (unsigned char*)argv[i];
+	vm->p1->nbr = build_nbr(nbr2);
+	vm->p2->nbr = build_nbr(nbr1);
+	ft_memcpy(vm->process->r[0], vm->p1->nbr, 4);
+	ft_memcpy(vm->process->next->r[0], vm->p2->nbr, 4);
+}
+
+unsigned char	*ft_read_files(char **argv, t_vm *vm)
 {
 	unsigned char	*arena;
 
-	initialize_players(&vm->p1, &vm->p2);
+	initialize_players(vm->p1, vm->p2);
 	make_process(vm);
-	arena = (unsigned char *)ft_strnew(4096);
-	if (((vm->p1.fd = open(ft_get_file(argv, 1), O_RDONLY)) < 0)
-		|| (vm->p2.fd = open(ft_get_file(argv, 2), O_RDONLY)) < 0)
+	arena = (unsigned char *)ft_strnew(MEM_SIZE - 1);
+	ft_get_file(argv, vm);
+	if (((vm->p1->fd = open((char*)vm->p1->filename, O_RDONLY)) < 0)
+		|| (vm->p2->fd = open((char*)vm->p2->filename, O_RDONLY)) < 0)
 		ft_exit_msg("File can't be open\n");
-	if (!ft_get_player(&vm->p1, arena) || !ft_get_player(&vm->p2, arena + 2048))
-		ft_exit_msg("File error\n");
+	if (!ft_get_player(vm->p1, arena)
+	|| !ft_get_player(vm->p2, arena + (MEM_SIZE / 2)))
+	{
+		free_all(vm);
+		ft_exit_msg("champion size can't go over CHAMP_MAX_SIZE (see op.h)\n");
+	}
+	if (close(vm->p1->fd) == -1 || close(vm->p2->fd) == -1)
+		ft_exit_msg("Close failed\n");
 	return (arena);
 }
